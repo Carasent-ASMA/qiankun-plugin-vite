@@ -137,7 +137,7 @@ export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
 
                             htmlStr = $.html()
                             // console.log('==============start===============')
-                            console.log(htmlStr)
+                            //console.log(htmlStr)
                             //  console.log('================end===============')
                             //htmlStr = $.html()
                         }
