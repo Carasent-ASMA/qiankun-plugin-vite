@@ -23,7 +23,7 @@ declare global {
         __vite_plugin_react_preamble_installed__: boolean
         moduleQiankunAppLifeCycles?: Record<string, QiankunLifeCycle>
         __GLOBAL_CONCURENT_QIANKUN__?: Record<string, QiankunWindow>
-        __POWERED_BY_QIANKUN__: boolean
+        __POWERED_BY_QIANKUN__?: boolean
     }
 }
 

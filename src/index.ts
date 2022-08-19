@@ -50,16 +50,37 @@ const createImportFinallyResolve = (qiankunName: string) => {
 export type MicroOption = {
     useDevMode?: boolean
 }
-type PluginFn = (qiankunName: string, microOption?: MicroOption) => PluginOption
 
+const createImport = (src: string, callback?: string) => {
+    const appendBase = "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + "
+
+    return `import(${appendBase}'${src}').then(${callback})`
+}
+type PluginFn = (qiankunName: string, microOption?: MicroOption) => PluginOption
+const createEntry = (entryScript: string) => `
+        let RefreshRuntime;
+        window.$RefreshReg$ = () => {};
+        window.$RefreshSig$ = () => (type) => type;
+        window.__vite_plugin_react_preamble_installed__ = true;
+        ${createImport(
+            '/@react-refresh',
+            `(module) => {
+        RefreshRuntime=module.default
+        RefreshRuntime.injectIntoGlobalHook(window)
+        ${entryScript}
+        }
+        `,
+        )}`
 export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
     let isProduction: boolean
+
     let base = ''
 
     const module2DynamicImport = ($: CheerioAPI, scriptTag: Element) => {
         if (!scriptTag) {
             return
         }
+
         const script$ = $(scriptTag)
 
         const moduleSrc = script$.attr('src')
@@ -75,27 +96,6 @@ export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
         script$.html(`import(${appendBase}'${moduleSrc}')`)
         return script$
     }
-    const createImport = (src: string, callback?: string) => {
-        let appendBase = ''
-
-        if (microOption.useDevMode && !isProduction) {
-            appendBase = "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + "
-        }
-
-        return `import(${appendBase}'${src}').then(${callback})`
-    }
-
-    const createEntry = (entryScript: string) => `
-        let RefreshRuntime;
-        ${createImport(
-            '/@react-refresh',
-            `(module) => {
-        RefreshRuntime=module.default
-        RefreshRuntime.injectIntoGlobalHook(window)
-        ${entryScript}
-        }
-        `,
-        )}`
 
     return {
         name: 'qiankun-html-transform',
@@ -122,11 +122,23 @@ export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
                             module2DynamicImport($, $(`script[src=${base}@vite/client]`).get(0)!)
                             //module2DynamicImport($, $('script[src=/@vite/client]').get(0))
                             const reactRefreshScript = $('script[type=module]')
+                            //const reactRefreshScriptstr = reactRefreshScript.toString()
+                            // console.log('==============reactRefreshScriptstr===============')
+                            //console.log(reactRefreshScriptstr)
+                            // console.log('==============reactRefreshScriptstr===============')
                             reactRefreshScript.removeAttr('type').empty()
+
                             const entryScript = $('#entry')
+
                             entryScript.html(createEntry(entryScript.html() as string))
+                            // console.log('==============entryScript===============')
+                            // console.log(entryScript.html())
+                            // console.log('==============entryScript===============')
 
                             htmlStr = $.html()
+                            // console.log('==============start===============')
+                            console.log(htmlStr)
+                            //  console.log('================end===============')
                             //htmlStr = $.html()
                         }
 
