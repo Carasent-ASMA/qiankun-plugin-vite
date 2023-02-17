@@ -52,9 +52,11 @@ export type MicroOption = {
 }
 
 const createImport = (src: string, callback?: string) => {
-    const appendBase = "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + "
+    //const appendBase = "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + "
 
-    return `import(${appendBase}'${src}').then(${callback})`
+    return `
+    import(path+'${src}').then(${callback})
+    `
 }
 type PluginFn = (qiankunName: string, microOption?: MicroOption) => PluginOption
 const createEntry = (entryScript: string) => `
@@ -64,6 +66,7 @@ const createEntry = (entryScript: string) => `
         window.__vite_plugin_react_preamble_installed__ = true;
         ${createImport(
             '/@react-refresh',
+
             `(module) => {
         RefreshRuntime=module.default
         RefreshRuntime.injectIntoGlobalHook(window)
@@ -85,15 +88,20 @@ export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
 
         const moduleSrc = script$.attr('src')
 
-        let appendBase = ''
+        //let appendBase = ''
+        const path = `
+         path = window.window?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__?.replace(/.$/, '') || '';
+        `
 
-        if (microOption.useDevMode && !isProduction) {
-            appendBase = "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + "
-        }
+        //if (microOption.useDevMode && !isProduction) {
+        //  appendBase = "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + "
+        //}
 
         script$.removeAttr('src')
         script$.removeAttr('type')
-        script$.html(`import(${appendBase}'${moduleSrc}')`)
+        script$.html(`${path}
+            import(path+'${moduleSrc}')
+            `)
         return script$
     }
 
