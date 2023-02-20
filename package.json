@@ -1,6 +1,6 @@
 {
   "name": "asma-qiankun-plugin-vite",
-  "version": "0.0.7",
+  "version": "0.0.6",
   "description": "vite for qiankun with some adjustments for hmr",
   "module": "es/index.js",
   "main": "dist/index.js",
@@ -19,7 +19,7 @@
     "es"
   ],
   "homepage": "",
-  "author": "ie",
+  "author": "IE",
   "license": "MIT",
   "dependencies": {
     "cheerio": "1.0.0-rc.12"
