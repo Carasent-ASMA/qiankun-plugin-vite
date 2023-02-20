@@ -10,7 +10,8 @@ const banner =
   '/*!\n' +
   ` * ${pkgname}.js v${version}\n` +
   ` * (c) 2022-${new Date().getFullYear()} IE\n` +
-  ' * Released under the MIT License.\n' +
+  ' * Released under the MIT License. \n' +
+  ' * Inspired by vite-plugin-qiankun (https://github.com/tengmaoqing/vite-plugin-qiankun). \n' +
   ' */'
 
 const builds = {
