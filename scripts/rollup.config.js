@@ -9,7 +9,7 @@ const pkgname = pkg.name
 const banner =
   '/*!\n' +
   ` * ${pkgname}.js v${version}\n` +
-  ` * (c) 2021-${new Date().getFullYear()} Teng Mao Qing\n` +
+  ` * (c) 2022-${new Date().getFullYear()} IE\n` +
   ' * Released under the MIT License.\n' +
   ' */'
 
