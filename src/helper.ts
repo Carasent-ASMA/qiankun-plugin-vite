@@ -5,6 +5,7 @@ window.$RefreshReg$ = () => {}
 window.$RefreshSig$ = () => (type) => type
 window.__vite_plugin_react_preamble_installed__ = true
 
+
 export interface QiankunProps {
     container?: HTMLElement
     [x: string]: unknown
@@ -43,7 +44,7 @@ export function generateQiankunHelpers(appName: string) {
                 window.moduleQiankunAppLifeCycles = {}
             }
 
-            if (qiankunWindow[`qiankunName`]) {
+            if (`qiankunName` in qiankunWindow && qiankunWindow.qiankunName) {
                 window.moduleQiankunAppLifeCycles[appName] = qiankunLifeCycle
             }
         }
