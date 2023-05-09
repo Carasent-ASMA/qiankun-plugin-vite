@@ -33,7 +33,7 @@ const createQiankunHelper = (qiankunName: string) => `
 
 const createImportFinallyResolve = (qiankunName: string) => {
     return `
-    const global_concurent_qiankun = window.proxy?.__GLOBAL_CONCURENT_QIANKUN__?.['${qiankunName}']
+    const global_concurent_qiankun = window.proxy?.__GLOBAL_CONCURRENT_QIANKUN__?.['${qiankunName}']
     if(global_concurent_qiankun){
         window.proxy = global_concurent_qiankun
     }

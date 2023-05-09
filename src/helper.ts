@@ -28,7 +28,7 @@ declare global {
         $RefreshSig$: () => <T>(type: T) => T
         __vite_plugin_react_preamble_installed__: boolean
         moduleQiankunAppLifeCycles?: Record<string, QiankunLifeCycle>
-        __GLOBAL_CONCURENT_QIANKUN__?: Record<string, QiankunWindow>
+        __GLOBAL_CONCURRENT_QIANKUN__?: Record<string, QiankunWindow>
         __POWERED_BY_QIANKUN__?: boolean
     }
 }
@@ -40,7 +40,7 @@ export interface QiankunWindow {
 
 export function generateQiankunHelpers(appName: string) {
     const qiankunWindow =
-        typeof window !== 'undefined' ? window.__GLOBAL_CONCURENT_QIANKUN__?.[appName] || window.proxy || window : {}
+        typeof window !== 'undefined' ? window.__GLOBAL_CONCURRENT_QIANKUN__?.[appName] || window.proxy || window : {}
 
     const renderWithQiankun = (qiankunLifeCycle: QiankunLifeCycle) => {
         // The function has only one chance to execute, and the life cycle needs to be assigned to the global
