@@ -5,6 +5,11 @@ window.$RefreshReg$ = () => {}
 window.$RefreshSig$ = () => (type) => type
 window.__vite_plugin_react_preamble_installed__ = true
 
+export interface IRender {
+    component_path?: string
+    occurrence?: number
+}
+export interface IRenderProps extends QiankunProps, IRender {}
 
 export interface QiankunProps {
     container?: HTMLElement
