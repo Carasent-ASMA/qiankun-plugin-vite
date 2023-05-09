@@ -33,9 +33,9 @@ const createQiankunHelper = (qiankunName: string) => `
 
 const createImportFinallyResolve = (qiankunName: string) => {
     return `
-    const global_concurent_qiankun = window.proxy?.__GLOBAL_CONCURRENT_QIANKUN__?.['${qiankunName}']
-    if(global_concurent_qiankun){
-        window.proxy = global_concurent_qiankun
+    const global_concurrent_qiankun = window.proxy?.__GLOBAL_CONCURRENT_QIANKUN__?.['${qiankunName}']
+    if(global_concurrent_qiankun){
+        window.proxy = global_concurrent_qiankun
     }
     const qiankunLifeCycle = window.moduleQiankunAppLifeCycles && window.moduleQiankunAppLifeCycles['${qiankunName}'];
     if (qiankunLifeCycle) {
@@ -130,10 +130,10 @@ export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
                             module2DynamicImport($, $(`script[src=${base}@vite/client]`).get(0)!)
                             //module2DynamicImport($, $('script[src=/@vite/client]').get(0))
                             const reactRefreshScript = $('script[type=module]')
-                            //const reactRefreshScriptstr = reactRefreshScript.toString()
-                            // console.log('==============reactRefreshScriptstr===============')
-                            //console.log(reactRefreshScriptstr)
-                            // console.log('==============reactRefreshScriptstr===============')
+                            //const reactRefreshScriptStr = reactRefreshScript.toString()
+                            // console.log('==============reactRefreshScriptStr===============')
+                            //console.log(reactRefreshScriptStr)
+                            // console.log('==============reactRefreshScriptStr===============')
                             reactRefreshScript.removeAttr('type').empty()
 
                             const entryScript = $('#entry')

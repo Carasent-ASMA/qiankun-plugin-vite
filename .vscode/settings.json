@@ -1,5 +1,11 @@
 {
     "cSpell.words": [
-        "camelcase"
+        "camelcase",
+        "crossorigin",
+        "middlewares",
+        "vitebootstrap",
+        "vitemount",
+        "viteunmount",
+        "viteupdate"
     ]
 }
