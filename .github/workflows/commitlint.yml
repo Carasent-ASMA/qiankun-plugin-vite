@@ -1,0 +1,23 @@
+name: Lint Commit Messages
+
+on:
+    pull_request:
+        branches:
+            - master
+
+permissions:
+    contents: read
+
+jobs:
+    commitlint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Install commitlint
+              run: npm install --no-save @commitlint/cli@20.4.3 @commitlint/config-conventional@20.4.3
+
+            - name: Validate PR commit messages
+              run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
