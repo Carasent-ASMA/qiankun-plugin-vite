@@ -1,5 +1,5 @@
-import { type CheerioAPI, type Element, load } from 'cheerio'
-import type { PluginOption } from 'vite'
+import { type CheerioAPI, type Element, load } from "cheerio";
+import type { PluginOption } from "vite";
 
 const createQiankunHelper = (qiankunName: string) => `
   const createDeffer = (hookName) => {
@@ -21,7 +21,7 @@ const createQiankunHelper = (qiankunName: string) => `
       update
     };
   })(window);
-`
+`;
 
 /* const _replaceSomeScript = ($: CheerioAPI, findStr: string, replaceStr = '') => {
     $('script').each((i, el) => {
@@ -30,9 +30,13 @@ const createQiankunHelper = (qiankunName: string) => `
         }
     })
 } */
-
+/**
+ *
+ * @param qiankunName
+ * @returns
+ */
 const createImportFinallyResolve = (qiankunName: string) => {
-    return `
+  return `
     const global_concurrent_qiankun = window.proxy?.__GLOBAL_CONCURRENT_QIANKUN__?.['${qiankunName}']
     if(global_concurrent_qiankun){
         window.proxy = global_concurrent_qiankun
@@ -44,129 +48,139 @@ const createImportFinallyResolve = (qiankunName: string) => {
       window.proxy.vitebootstrap(() => qiankunLifeCycle.bootstrap());
       window.proxy.viteupdate((props) => qiankunLifeCycle.update(props));
     }
-  `
-}
+  `;
+};
 
 export type MicroOption = {
-    useDevMode?: boolean
-}
+  useDevMode?: boolean;
+};
 
 const createImport = (src: string, callback?: string) => {
-    const appendBase = "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + "
+  const appendBase =
+    "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + ";
 
-    return `import(${appendBase}'${src}').then(${callback})`
-}
-type PluginFn = (qiankunName: string, microOption?: MicroOption) => PluginOption
+  return `import(${appendBase}'${src}').then(${callback})`;
+};
+type PluginFn = (
+  qiankunName: string,
+  microOption?: MicroOption,
+) => PluginOption;
 const createEntry = (entryScript: string) => `
         let RefreshRuntime;
         window.$RefreshReg$ = () => {};
         window.$RefreshSig$ = () => (type) => type;
         window.__vite_plugin_react_preamble_installed__ = true;
         ${createImport(
-            '/@react-refresh',
-            `(module) => {
+          "/@react-refresh",
+          `(module) => {
         RefreshRuntime=module.default
         RefreshRuntime.injectIntoGlobalHook(window)
         ${entryScript}
         }
         `,
-        )}`
+        )}`;
 export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
-    let isProduction: boolean
+  let isProduction: boolean;
 
-    let base = ''
+  let base = "";
 
-    const module2DynamicImport = ($: CheerioAPI, scriptTag: Element) => {
-        if (!scriptTag) {
-            return
-        }
-
-        const script$ = $(scriptTag)
-
-        const moduleSrc = script$.attr('src')
-
-        let appendBase = ''
-
-        if (microOption.useDevMode && !isProduction) {
-            appendBase = "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + "
-        }
-
-        script$.removeAttr('src')
-        script$.removeAttr('type')
-        script$.html(`import(${appendBase}'${moduleSrc}')`)
-        return script$
+  const module2DynamicImport = ($: CheerioAPI, scriptTag: Element) => {
+    if (!scriptTag) {
+      return;
     }
 
-    return {
-        name: 'qiankun-html-transform',
-        configResolved(config) {
-            isProduction = config.command === 'build' || config.isProduction
-            base = config.base
-        },
+    const script$ = $(scriptTag);
 
-        configureServer(server) {
-            return () => {
-                server.middlewares.use((_req, res, next) => {
-                    if (isProduction || !microOption.useDevMode) {
-                        next()
-                        return
-                    }
-                    const end = res.end.bind(res)
-                    res.end = (...args: ((() => void) | undefined)[] | string[]) => {
-                        let [htmlStr] = args
-                        const [_, ...rest] = args
-                        if (typeof htmlStr === 'string') {
-                            const $ = load(htmlStr)
-                            //const $ = load(htmlStr)
+    const moduleSrc = script$.attr("src");
 
-                            module2DynamicImport($, $(`script[src=${base}@vite/client]`).get(0)!)
-                            //module2DynamicImport($, $('script[src=/@vite/client]').get(0))
-                            const reactRefreshScript = $('script[type=module]')
-                            //const reactRefreshScriptStr = reactRefreshScript.toString()
-                            // console.log('==============reactRefreshScriptStr===============')
-                            //console.log(reactRefreshScriptStr)
-                            // console.log('==============reactRefreshScriptStr===============')
-                            reactRefreshScript.removeAttr('type').empty()
+    let appendBase = "";
 
-                            const entryScript = $('#entry')
+    if (microOption.useDevMode && !isProduction) {
+      appendBase =
+        "(window.proxy ? (window.proxy?.__INJECTED_PUBLIC_PATH_BY_QIANKUN__ + '..') : '') + ";
+    }
 
-                            entryScript.html(createEntry(entryScript.html() as string))
-                            // console.log('==============entryScript===============')
-                            // console.log(entryScript.html())
-                            // console.log('==============entryScript===============')
+    script$.removeAttr("src");
+    script$.removeAttr("type");
+    script$.html(`import(${appendBase}'${moduleSrc}')`);
+    return script$;
+  };
 
-                            htmlStr = $.html()
-                            // console.log('==============start===============')
-                            //console.log(htmlStr)
-                            //  console.log('================end===============')
-                            //htmlStr = $.html()
-                        }
+  return {
+    name: "qiankun-html-transform",
+    configResolved(config) {
+      isProduction = config.command === "build" || config.isProduction;
+      base = config.base;
+    },
 
-                        return end(htmlStr, ...(rest as ((() => void) | undefined)[]))
-                    }
-                    next()
-                })
+    configureServer(server) {
+      return () => {
+        server.middlewares.use((_req, res, next) => {
+          if (isProduction || !microOption.useDevMode) {
+            next();
+            return;
+          }
+          const end = res.end.bind(res);
+          res.end = (...args: ((() => void) | undefined)[] | string[]) => {
+            let [htmlStr] = args;
+            const [_, ...rest] = args;
+            if (typeof htmlStr === "string") {
+              const $ = load(htmlStr);
+              //const $ = load(htmlStr)
+
+              module2DynamicImport(
+                $,
+                $(`script[src=${base}@vite/client]`).get(0)!,
+              );
+              //module2DynamicImport($, $('script[src=/@vite/client]').get(0))
+              const reactRefreshScript = $("script[type=module]");
+              //const reactRefreshScriptStr = reactRefreshScript.toString()
+              // console.log('==============reactRefreshScriptStr===============')
+              //console.log(reactRefreshScriptStr)
+              // console.log('==============reactRefreshScriptStr===============')
+              reactRefreshScript.removeAttr("type").empty();
+
+              const entryScript = $("#entry");
+
+              entryScript.html(createEntry(entryScript.html() as string));
+              // console.log('==============entryScript===============')
+              // console.log(entryScript.html())
+              // console.log('==============entryScript===============')
+
+              htmlStr = $.html();
+              // console.log('==============start===============')
+              //console.log(htmlStr)
+              //  console.log('================end===============')
+              //htmlStr = $.html()
             }
-        },
-        transformIndexHtml(html: string) {
-            const $ = load(html)
-            const moduleTags = $('body script[type=module], head script[crossorigin=""]')
-            if (!moduleTags || !moduleTags.length) {
-                return
-            }
-            const len = moduleTags.length
-            moduleTags.each((i, moduleTag) => {
-                const script$ = module2DynamicImport($, moduleTag)
-                if (len - 1 === i) {
-                    script$?.html(`${script$.html()}.finally(() => {
+
+            return end(htmlStr, ...(rest as ((() => void) | undefined)[]));
+          };
+          next();
+        });
+      };
+    },
+    transformIndexHtml(html: string) {
+      const $ = load(html);
+      const moduleTags = $(
+        'body script[type=module], head script[crossorigin=""]',
+      );
+      if (!moduleTags || !moduleTags.length) {
+        return;
+      }
+      const len = moduleTags.length;
+      moduleTags.each((i, moduleTag) => {
+        const script$ = module2DynamicImport($, moduleTag);
+        if (len - 1 === i) {
+          script$?.html(`${script$.html()}.finally(() => {
             ${createImportFinallyResolve(qiankunName)}
-          })`)
-                }
-            })
+          })`);
+        }
+      });
 
-            $('body').append(`<script>${createQiankunHelper(qiankunName)}</script>`)
-            const output = $.html()
-            return output
-        },
-    }
-}
+      $("body").append(`<script>${createQiankunHelper(qiankunName)}</script>`);
+      const output = $.html();
+      return output;
+    },
+  };
+};
