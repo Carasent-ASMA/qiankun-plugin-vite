@@ -30,11 +30,7 @@ const createQiankunHelper = (qiankunName: string) => `
         }
     })
 } */
-/**
- *
- * @param qiankunName
- * @returns
- */
+
 const createImportFinallyResolve = (qiankunName: string) => {
   return `
     const global_concurrent_qiankun = window.proxy?.__GLOBAL_CONCURRENT_QIANKUN__?.['${qiankunName}']
