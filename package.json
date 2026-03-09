@@ -18,7 +18,11 @@
     "dist",
     "es"
   ],
-  "homepage": "",
+  "homepage": "https://github.com/Carasent-ASMA/qiankun-plugin-vite",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Carasent-ASMA/qiankun-plugin-vite"
+  },
   "author": "IE",
   "license": "MIT",
   "dependencies": {
