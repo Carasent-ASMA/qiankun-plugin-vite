@@ -1,31 +1,37 @@
-#### 简介
+# Overview
 
-> vite-plugin-qiankun: 帮助应用快速接入乾坤的vite插件
+> vite-plugin-qiankun: a Vite plugin that helps applications integrate with Qiankun quickly.
 
-- 保留vite构建es模块的优势
-- 一键配置，不影响已有的vite配置
-- 支持vite开发环境
+- Preserves the advantages of Vite building ES modules
+- One-step configuration without affecting the existing Vite setup
+- Supports the Vite development environment
 
-#### 快速开始
+## Quick Start
 
-###### 1、在 `vite.config.ts` 中安装插件
+### 1. Install the plugin in `vite.config.ts`
+
 ```typescript
 // vite.config.ts
 
-import qiankun from 'vite-plugin-qiankun';
+import { qiankun } from 'asma-qiankun-plugin-vite';
 
 export default {
-  // 这里的 'myMicroAppName' 是子应用名，主应用注册时AppName需保持一致
+  // 'myMicroAppName' is the micro-app name and must match the AppName used by the host app
   plugins: [qiankun('myMicroAppName')],
-  // 生产环境需要指定运行域名作为base
+  // In production, set the deployment domain as the base
   base: 'http://xxx.com/'
 }
 ```
-###### 2、在入口文件里面写入乾坤的生命周期配置
+
+### 2. Add the Qiankun lifecycle configuration in the entry file
 
 ```typescript
 // main.ts
-import { renderWithQiankun, qiankunWindow } from 'vite-plugin-qiankun/dist/helper';
+import {
+  generateQiankunHelpers,
+} from 'asma-qiankun-plugin-vite/helper';
+
+const { renderWithQiankun, qiankunWindow } = generateQiankunHelpers('myMicroAppName');
 
 // some code
 renderWithQiankun({
@@ -51,12 +57,12 @@ if (!qiankunWindow.__POWERED_BY_QIANKUN__) {
 }
 ```
 
-###### 3、dev下作为子应用调试
+### 3. Debug as a micro-app in development
 
-> 因为开发环境作为子应用时与热更新插件（可能与其他修改html的插件也会存在冲突）有冲突，所以需要额外的调试配置
+> When running as a micro-app in development, there is a conflict with the hot-reload plugin, and possibly with other plugins that modify HTML, so an extra debug configuration is required.
 
 ```typescript
-// useDevMode 开启时与热更新插件冲突,使用变量切换
+// useDevMode conflicts with the hot-reload plugin when enabled, so switch it with a variable
 const useDevMode = true
 
 const baseConfig: UserConfig = {
@@ -72,33 +78,40 @@ const baseConfig: UserConfig = {
   ],
 }
 ```
-上面例子中 `useDevMode = true` 则不使用热更新插件，`useDevMode = false` 则能使用热更新，但无法作为子应用加载。
 
-###### 4、其它使用注意点 `qiankunWindow`
+In the example above, `useDevMode = true` disables the hot-reload plugin, while `useDevMode = false` enables hot reload but prevents the app from loading as a micro-app.
 
-因为es模块加载与`qiankun`的实现方式有些冲突，所以使用本插件实现的`qiankun`微应用里面没有运行在js沙盒中。所以在不可避免需要设置window上的属性时，尽量显示的操作js沙盒，否则可能会对其它子应用产生副作用。qiankun沙盒使用方式
+### 4. Other notes for using `qiankunWindow`
+
+Because ES module loading has some conflicts with how `qiankun` works, micro-apps implemented with this plugin do not run inside the JavaScript sandbox. If you must assign properties on `window`, explicitly operate on the Qiankun sandbox whenever possible. Otherwise, you may introduce side effects for other micro-apps. Example sandbox usage:
+
 ```typescript
-import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper';
+import {
+  generateQiankunHelpers,
+} from 'asma-qiankun-plugin-vite/helper';
+
+const { qiankunWindow } = generateQiankunHelpers('myMicroAppName');
 
 qiankunWindow.customxxx = 'ssss'
 
 if (qiankunWindow.__POWERED_BY_QIANKUN__) {
-  console.log('我正在作为子应用运行')
+  console.log('I am running as a micro-app')
 }
 
 ```
 
-#### 例子
+## Examples
 
-详细的信息可以参考例子里面的使用方式
- ```
+For more details, refer to the usage examples.
+
+```bash
 git clone xx
-npm install
-npm run example:install
-# 生产环境调试demo
-npm run example:start
-# vite开发环境demo, demo中热更新已经关闭
-npm run example:start-vite-dev
+pnpm install
+pnpm run example:install
+# Production debug demo
+pnpm run example:start
+# Vite development demo, hot reload is disabled in this demo
+pnpm run example:start-vite-dev
 ```
 
 

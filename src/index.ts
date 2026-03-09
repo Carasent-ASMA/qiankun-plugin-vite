@@ -1,4 +1,4 @@
-import { type CheerioAPI, type Element, load } from "cheerio";
+import { type CheerioAPI, load } from "cheerio";
 import type { PluginOption } from "vite";
 
 const createQiankunHelper = (qiankunName: string) => `
@@ -80,14 +80,16 @@ export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
 
   let base = "";
 
-  const module2DynamicImport = ($: CheerioAPI, scriptTag: Element) => {
-    if (!scriptTag) {
+  const module2DynamicImport = (script$: ReturnType<CheerioAPI>) => {
+    if (!script$.length) {
       return;
     }
 
-    const script$ = $(scriptTag);
-
     const moduleSrc = script$.attr("src");
+
+    if (!moduleSrc) {
+      return script$;
+    }
 
     let appendBase = "";
 
@@ -122,32 +124,17 @@ export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
             const [_, ...rest] = args;
             if (typeof htmlStr === "string") {
               const $ = load(htmlStr);
-              //const $ = load(htmlStr)
 
-              module2DynamicImport(
-                $,
-                $(`script[src=${base}@vite/client]`).get(0)!,
-              );
-              //module2DynamicImport($, $('script[src=/@vite/client]').get(0))
+              module2DynamicImport($(`script[src=${base}@vite/client]`));
+
               const reactRefreshScript = $("script[type=module]");
-              //const reactRefreshScriptStr = reactRefreshScript.toString()
-              // console.log('==============reactRefreshScriptStr===============')
-              //console.log(reactRefreshScriptStr)
-              // console.log('==============reactRefreshScriptStr===============')
               reactRefreshScript.removeAttr("type").empty();
 
               const entryScript = $("#entry");
 
               entryScript.html(createEntry(entryScript.html() as string));
-              // console.log('==============entryScript===============')
-              // console.log(entryScript.html())
-              // console.log('==============entryScript===============')
 
               htmlStr = $.html();
-              // console.log('==============start===============')
-              //console.log(htmlStr)
-              //  console.log('================end===============')
-              //htmlStr = $.html()
             }
 
             return end(htmlStr, ...(rest as ((() => void) | undefined)[]));
@@ -166,7 +153,7 @@ export const qiankun: PluginFn = (qiankunName, microOption = {}) => {
       }
       const len = moduleTags.length;
       moduleTags.each((i, moduleTag) => {
-        const script$ = module2DynamicImport($, moduleTag);
+        const script$ = module2DynamicImport($(moduleTag));
         if (len - 1 === i) {
           script$?.html(`${script$.html()}.finally(() => {
             ${createImportFinallyResolve(qiankunName)}
